@@ -10,19 +10,20 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
-  Dimensions,
 } from 'react-native';
 
 export default function ComenzarScreen() {
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [plan, setPlan] = useState('basico_price');
+  const [plan, setPlan] = useState('price_semanal');
 
   const planesDisponibles = [
-    { nombre: 'Básico', priceId: 'basico_price' },
-    { nombre: 'Estándar', priceId: 'estandar_price' },
-    { nombre: 'Premium', priceId: 'premium_price' },
+    { nombre: 'Semanal', priceId: 'price_semanal', precio: '$10 MXN' },
+    { nombre: 'Mensual', priceId: 'price_mensual', precio: '$50 MXN' },
+    { nombre: 'Bimensual', priceId: 'price_bimensual', precio: '$100 MXN' },
+    { nombre: 'Semestral', priceId: 'price_semestral', precio: '$300 MXN' },
+    { nombre: 'Anual', priceId: 'price_anual', precio: '$600 MXN' },
   ];
 
   const handleCrearCuenta = async () => {
@@ -58,14 +59,14 @@ export default function ComenzarScreen() {
     >
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.card}>
-          {/* LOGO Y TÍTULO EN LA MISMA FILA */}
+          {/* Encabezado con logo + título */}
           <View style={styles.headerRow}>
+            <Text style={styles.title}>Crear tu cuenta</Text>
             <Image
               source={require('@/assets/images/metropago.png')}
               style={styles.logoSmall}
               resizeMode="contain"
             />
-            <Text style={styles.title}>Crear tu cuenta</Text>
           </View>
 
           <TextInput
@@ -111,6 +112,14 @@ export default function ComenzarScreen() {
                 >
                   {opcion.nombre}
                 </Text>
+                <Text
+                  style={[
+                    styles.planPrice,
+                    plan === opcion.priceId && styles.planTextSelected,
+                  ]}
+                >
+                  {opcion.precio}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -143,13 +152,12 @@ const styles = StyleSheet.create({
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     marginBottom: 24,
   },
   logoSmall: {
-    width: 36,
-    height: 36,
-    marginRight: 10,
+    width: 32,
+    height: 32,
   },
   title: {
     fontSize: 22,
@@ -173,12 +181,13 @@ const styles = StyleSheet.create({
   },
   planContainer: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     marginBottom: 20,
   },
   planOption: {
-    flex: 1,
-    marginHorizontal: 4,
+    width: '48%',
+    marginBottom: 12,
     paddingVertical: 12,
     backgroundColor: '#e5e7eb',
     borderRadius: 8,
@@ -189,8 +198,13 @@ const styles = StyleSheet.create({
   },
   planText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '600',
     color: '#111827',
+  },
+  planPrice: {
+    fontSize: 13,
+    color: '#6b7280',
+    marginTop: 4,
   },
   planTextSelected: {
     color: '#ffffff',
@@ -208,7 +222,5 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
-
-
 
 
