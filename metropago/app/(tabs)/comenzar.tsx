@@ -4,27 +4,28 @@ import {
   Text,
   TextInput,
   StyleSheet,
-  Button,
   Alert,
-  ScrollView,
   KeyboardAvoidingView,
   Platform,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  Dimensions,
 } from 'react-native';
 
-export default function ComenzarScreen(){
-  const [nombre, setNombre] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [plan, setPlan] = useState<string>('basico_price'); // default priceId
+export default function ComenzarScreen() {
+  const [nombre, setNombre] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [plan, setPlan] = useState('basico_price');
 
-  // Mapea planes a priceIds reales de Stripe
-  const planesDisponibles: { nombre: string; priceId: string }[] = [
+  const planesDisponibles = [
     { nombre: 'Básico', priceId: 'basico_price' },
     { nombre: 'Estándar', priceId: 'estandar_price' },
     { nombre: 'Premium', priceId: 'premium_price' },
   ];
 
-  const handleCrearCuenta = async (): Promise<void> => {
+  const handleCrearCuenta = async () => {
     if (!nombre || !email || !password || !plan) {
       Alert.alert('Faltan datos', 'Por favor completa todos los campos.');
       return;
@@ -33,22 +34,14 @@ export default function ComenzarScreen(){
     try {
       const response = await fetch('http://localhost:3000/users/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          nombre,
-          email,
-          password,
-          priceId: plan,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre, email, password, priceId: plan }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
         Alert.alert('Cuenta creada', `Bienvenido/a ${nombre}`);
-        console.log('Respuesta:', data);
       } else {
         Alert.alert('Error', data.message || 'No se pudo crear la cuenta.');
       }
@@ -64,45 +57,67 @@ export default function ComenzarScreen(){
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Crear Cuenta</Text>
-
-        <TextInput
-          style={styles.input}
-          placeholder="Nombre"
-          value={nombre}
-          onChangeText={setNombre}
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Correo electrónico"
-          keyboardType="email-address"
-          autoCapitalize="none"
-          value={email}
-          onChangeText={setEmail}
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Contraseña"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
-
-        <Text style={styles.label}>Selecciona un plan:</Text>
-        {planesDisponibles.map((opcion) => (
-          <View key={opcion.priceId} style={styles.planButton}>
-            <Button
-              title={plan === opcion.priceId ? `✓ ${opcion.nombre}` : opcion.nombre}
-              onPress={() => setPlan(opcion.priceId)}
-              color={plan === opcion.priceId ? '#1976D2' : undefined}
+        <View style={styles.card}>
+          {/* LOGO Y TÍTULO EN LA MISMA FILA */}
+          <View style={styles.headerRow}>
+            <Image
+              source={require('@/assets/images/metropago.png')}
+              style={styles.logoSmall}
+              resizeMode="contain"
             />
+            <Text style={styles.title}>Crear tu cuenta</Text>
           </View>
-        ))}
 
-        <View style={styles.submitButton}>
-          <Button title="Crear Cuenta" onPress={handleCrearCuenta} />
+          <TextInput
+            style={styles.input}
+            placeholder="Nombre completo"
+            value={nombre}
+            onChangeText={setNombre}
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Correo electrónico"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            value={email}
+            onChangeText={setEmail}
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Contraseña"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
+
+          <Text style={styles.label}>Selecciona un plan</Text>
+          <View style={styles.planContainer}>
+            {planesDisponibles.map((opcion) => (
+              <TouchableOpacity
+                key={opcion.priceId}
+                style={[
+                  styles.planOption,
+                  plan === opcion.priceId && styles.planSelected,
+                ]}
+                onPress={() => setPlan(opcion.priceId)}
+              >
+                <Text
+                  style={[
+                    styles.planText,
+                    plan === opcion.priceId && styles.planTextSelected,
+                  ]}
+                >
+                  {opcion.nombre}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <TouchableOpacity style={styles.button} onPress={handleCrearCuenta}>
+            <Text style={styles.buttonText}>Crear Cuenta</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -111,33 +126,89 @@ export default function ComenzarScreen(){
 
 const styles = StyleSheet.create({
   container: {
-    padding: 24,
-    backgroundColor: '#F1F5F9',
     flexGrow: 1,
+    backgroundColor: '#f0f4f8',
     justifyContent: 'center',
+    padding: 24,
+  },
+  card: {
+    backgroundColor: '#ffffff',
+    borderRadius: 20,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 24,
+  },
+  logoSmall: {
+    width: 36,
+    height: 36,
+    marginRight: 10,
   },
   title: {
     fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 16,
-    textAlign: 'center',
+    fontWeight: '600',
+    color: '#1f2937',
   },
   input: {
-    backgroundColor: '#FFF',
+    backgroundColor: '#f9fafb',
     borderWidth: 1,
-    borderColor: '#DDD',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 12,
+    borderColor: '#d1d5db',
+    padding: 14,
+    borderRadius: 10,
+    marginBottom: 16,
+    fontSize: 16,
   },
   label: {
     fontSize: 16,
-    marginVertical: 8,
-  },
-  planButton: {
     marginBottom: 8,
+    fontWeight: '500',
+    color: '#374151',
   },
-  submitButton: {
-    marginTop: 24,
+  planContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  planOption: {
+    flex: 1,
+    marginHorizontal: 4,
+    paddingVertical: 12,
+    backgroundColor: '#e5e7eb',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  planSelected: {
+    backgroundColor: '#3b82f6',
+  },
+  planText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#111827',
+  },
+  planTextSelected: {
+    color: '#ffffff',
+  },
+  button: {
+    backgroundColor: '#2563eb',
+    paddingVertical: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  buttonText: {
+    color: '#ffffff',
+    fontSize: 17,
+    fontWeight: '600',
   },
 });
+
+
+
+
