@@ -6,7 +6,7 @@ export default function HomeScreen() {
   const router = useRouter();
 
   const handleStart = () => {
-    router.push('/comenzar'); // Navega a la pantalla comenzar.tsx
+    router.push('/comenzar'); 
   };
 
   return (

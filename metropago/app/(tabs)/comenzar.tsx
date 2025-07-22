@@ -11,19 +11,21 @@ import {
   Image,
   ScrollView,
 } from 'react-native';
+import { Linking } from 'react-native';
+
 
 export default function ComenzarScreen() {
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [plan, setPlan] = useState('price_semanal');
+  const [plan, setPlan] = useState('price_1RlI9jPKNWjJLZi9ywBM9GKo');
 
   const planesDisponibles = [
-    { nombre: 'Semanal', priceId: 'price_semanal', precio: '$10 MXN' },
-    { nombre: 'Mensual', priceId: 'price_mensual', precio: '$50 MXN' },
-    { nombre: 'Bimensual', priceId: 'price_bimensual', precio: '$100 MXN' },
-    { nombre: 'Semestral', priceId: 'price_semestral', precio: '$300 MXN' },
-    { nombre: 'Anual', priceId: 'price_anual', precio: '$600 MXN' },
+    { nombre: 'Semanal', priceId: 'price_1RlI9jPKNWjJLZi9ywBM9GKo', precio: '$10 MXN' },
+    { nombre: 'Mensual', priceId: 'price_1RlKi7PKNWjJLZi9DF8h8D4a', precio: '$50 MXN' },
+    { nombre: 'Bimensual', priceId: 'price_1RlKjjPKNWjJLZi9PTB3eOOs', precio: '$100 MXN' },
+    { nombre: 'Semestral', priceId: 'price_1RlKmNPKNWjJLZi9lTleDTfj', precio: '$300 MXN' },
+    { nombre: 'Anual', priceId: 'price_1RlKnbPKNWjJLZi9rX5SLPu1', precio: '$600 MXN' },
   ];
 
   const handleCrearCuenta = async () => {
@@ -31,18 +33,25 @@ export default function ComenzarScreen() {
       Alert.alert('Faltan datos', 'Por favor completa todos los campos.');
       return;
     }
-
+  
     try {
       const response = await fetch('http://localhost:3000/users/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nombre, email, password, priceId: plan }),
       });
-
+  
       const data = await response.json();
-
+  
       if (response.ok) {
-        Alert.alert('Cuenta creada', `Bienvenido/a ${nombre}`);
+        // Redirigir a Stripe Checkout
+        if (data.checkoutUrl) {
+          Alert.alert('Redirigiendo a pago...');
+          // Abrir Stripe en navegador (o usar expo-web-browser si quieres)
+          Linking.openURL(data.checkoutUrl);
+        } else {
+          Alert.alert('Error', 'No se pudo iniciar el pago.');
+        }
       } else {
         Alert.alert('Error', data.message || 'No se pudo crear la cuenta.');
       }
@@ -51,6 +60,7 @@ export default function ComenzarScreen() {
       Alert.alert('Error', 'No se pudo conectar al servidor.');
     }
   };
+  
 
   return (
     <KeyboardAvoidingView
