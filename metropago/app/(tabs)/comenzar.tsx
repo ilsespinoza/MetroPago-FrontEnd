@@ -44,10 +44,8 @@ export default function ComenzarScreen() {
       const data = await response.json();
   
       if (response.ok) {
-        // Redirigir a Stripe Checkout
         if (data.checkoutUrl) {
           Alert.alert('Redirigiendo a pago...');
-          // Abrir Stripe en navegador (o usar expo-web-browser si quieres)
           Linking.openURL(data.checkoutUrl);
         } else {
           Alert.alert('Error', 'No se pudo iniciar el pago.');
@@ -69,7 +67,6 @@ export default function ComenzarScreen() {
     >
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.card}>
-          {/* Encabezado con logo + título */}
           <View style={styles.headerRow}>
             <Text style={styles.title}>Crear tu cuenta</Text>
             <Image
