@@ -13,10 +13,18 @@
       "infoPlist": {
         "CFBundleURLTypes": [
           {
-            "CFBundleURLSchemes": ["metropago"]
+            "CFBundleURLSchemes": [
+              "metropago"
+            ]
+          },
+          {
+            "CFBundleURLSchemes": [
+              "metropago"
+            ]
           }
         ]
-      }
+      },
+      "bundleIdentifier": "com.ilseespinoza.metropago"
     },
     "android": {
       "adaptiveIcon": {
@@ -32,7 +40,10 @@
               "scheme": "metropago"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ]
     },
@@ -58,4 +69,3 @@
     }
   }
 }
-
