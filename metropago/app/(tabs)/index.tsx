@@ -12,7 +12,7 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <Image
-        source={require('@/assets/images/metropago.png')} 
+        source={require('@/assets/images/logo1.png')} 
         style={styles.logo}
       />
       <Text style={styles.title}>¡Bienvenido a la app!</Text>

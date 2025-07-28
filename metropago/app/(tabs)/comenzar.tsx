@@ -70,7 +70,7 @@ export default function ComenzarScreen() {
           <View style={styles.headerRow}>
             <Text style={styles.title}>Crear tu cuenta</Text>
             <Image
-              source={require('@/assets/images/metropago.png')}
+              source={require('@/assets/images/logo1.png')}
               style={styles.logoSmall}
               resizeMode="contain"
             />
