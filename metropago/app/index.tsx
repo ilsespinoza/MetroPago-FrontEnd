@@ -5,7 +5,7 @@ export default function Index() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace('/login/login'); 
+    router.replace('./(tabs)/index.tsx'); 
   }, []);
 
   return null; 
