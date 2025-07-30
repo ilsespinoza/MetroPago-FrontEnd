@@ -6,20 +6,26 @@ export default function HomeScreen() {
   const router = useRouter();
 
   const handleStart = () => {
-    router.push('/comenzar'); 
+    router.push('/comenzar');
+  };
+
+  const handleLogin = () => {
+    router.push('/login/login');
   };
 
   return (
     <View style={styles.container}>
       <Image
-        source={require('@/assets/images/logo1.png')} 
+        source={require('@/assets/images/logo1.png')}
         style={styles.logo}
       />
       <Text style={styles.title}>¡Bienvenido a la app!</Text>
       <Text style={styles.subtitle}>Gestiona tus datos fácilmente desde un solo lugar.</Text>
 
       <View style={styles.buttonContainer}>
-        <Button title="Comenzar" onPress={handleStart} />
+        <Button title="Crear cuenta" onPress={handleStart} color="#A52019" />
+        <View style={{ height: 16 }} /> 
+        <Button title="Iniciar sesión" onPress={handleLogin} color="#A52029" />
       </View>
     </View>
   );
@@ -54,5 +60,6 @@ const styles = StyleSheet.create({
     width: '60%',
   },
 });
+
 
 
