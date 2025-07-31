@@ -10,8 +10,9 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  Modal,
+  Linking,
 } from "react-native";
-import { Linking } from "react-native";
 
 export default function ComenzarScreen() {
   const [nombre, setNombre] = useState("");
@@ -22,32 +23,15 @@ export default function ComenzarScreen() {
   const [password, setPassword] = useState("");
   const [plan, setPlan] = useState("price_1RlI9jPKNWjJLZi9ywBM9GKo");
 
+  const [modalVisible, setModalVisible] = useState(false);
+  const [metodoPago, setMetodoPago] = useState("card");
+
   const planesDisponibles = [
-    {
-      nombre: "Semanal",
-      priceId: "price_1RlI9jPKNWjJLZi9ywBM9GKo",
-      precio: "$10 MXN",
-    },
-    {
-      nombre: "Mensual",
-      priceId: "price_1RlKi7PKNWjJLZi9DF8h8D4a",
-      precio: "$50 MXN",
-    },
-    {
-      nombre: "Bimensual",
-      priceId: "price_1RlKjjPKNWjJLZi9PTB3eOOs",
-      precio: "$100 MXN",
-    },
-    {
-      nombre: "Semestral",
-      priceId: "price_1RlKmNPKNWjJLZi9lTleDTfj",
-      precio: "$300 MXN",
-    },
-    {
-      nombre: "Anual",
-      priceId: "price_1RlKnbPKNWjJLZi9rX5SLPu1",
-      precio: "$600 MXN",
-    },
+    { nombre: "Semanal", priceId: "price_1RlI9jPKNWjJLZi9ywBM9GKo", precio: "$10 MXN" },
+    { nombre: "Mensual", priceId: "price_1RlKi7PKNWjJLZi9DF8h8D4a", precio: "$50 MXN" },
+    { nombre: "Bimensual", priceId: "price_1RlKjjPKNWjJLZi9PTB3eOOs", precio: "$100 MXN" },
+    { nombre: "Semestral", priceId: "price_1RlKmNPKNWjJLZi9lTleDTfj", precio: "$300 MXN" },
+    { nombre: "Anual", priceId: "price_1RlKnbPKNWjJLZi9rX5SLPu1", precio: "$600 MXN" },
   ];
 
   const handleCrearCuenta = async () => {
@@ -68,6 +52,7 @@ export default function ComenzarScreen() {
           ciudad,
           apellido,
           telefono,
+          metodoPago,
         }),
       });
 
@@ -94,7 +79,11 @@ export default function ComenzarScreen() {
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.card}>
           <View style={styles.headerRow}>
             <Text style={styles.title}>Crear tu cuenta</Text>
@@ -105,32 +94,10 @@ export default function ComenzarScreen() {
             />
           </View>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Nombre"
-            value={nombre}
-            onChangeText={setNombre}
-          />
-
-          <TextInput
-            style={styles.input}
-            placeholder="Apellido"
-            value={apellido}
-            onChangeText={setApellido}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Ciudad"
-            value={ciudad}
-            onChangeText={setCiudad}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Telefono"
-            value={telefono}
-            onChangeText={setTelefono}
-          />
-
+          <TextInput style={styles.input} placeholder="Nombre" value={nombre} onChangeText={setNombre} />
+          <TextInput style={styles.input} placeholder="Apellido" value={apellido} onChangeText={setApellido} />
+          <TextInput style={styles.input} placeholder="Ciudad" value={ciudad} onChangeText={setCiudad} />
+          <TextInput style={styles.input} placeholder="Teléfono" value={telefono} onChangeText={setTelefono} />
           <TextInput
             style={styles.input}
             placeholder="Correo electrónico"
@@ -139,7 +106,6 @@ export default function ComenzarScreen() {
             value={email}
             onChangeText={setEmail}
           />
-
           <TextInput
             style={styles.input}
             placeholder="Contraseña"
@@ -153,37 +119,72 @@ export default function ComenzarScreen() {
             {planesDisponibles.map((opcion) => (
               <TouchableOpacity
                 key={opcion.priceId}
-                style={[
-                  styles.planOption,
-                  plan === opcion.priceId && styles.planSelected,
-                ]}
+                style={[styles.planOption, plan === opcion.priceId && styles.planSelected]}
                 onPress={() => setPlan(opcion.priceId)}
               >
-                <Text
-                  style={[
-                    styles.planText,
-                    plan === opcion.priceId && styles.planTextSelected,
-                  ]}
-                >
-                  {opcion.nombre}
-                </Text>
-                <Text
-                  style={[
-                    styles.planPrice,
-                    plan === opcion.priceId && styles.planTextSelected,
-                  ]}
-                >
-                  {opcion.precio}
-                </Text>
+                <Text style={[styles.planText, plan === opcion.priceId && styles.planTextSelected]}>{opcion.nombre}</Text>
+                <Text style={[styles.planPrice, plan === opcion.priceId && styles.planTextSelected]}>{opcion.precio}</Text>
               </TouchableOpacity>
             ))}
           </View>
 
-          <TouchableOpacity style={styles.button} onPress={handleCrearCuenta}>
+          <TouchableOpacity style={styles.button} onPress={() => setModalVisible(true)}>
             <Text style={styles.buttonText}>Crear Cuenta</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* Modal de selección de método de pago */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Selecciona el método de pago</Text>
+
+            <ScrollView style={styles.scrollViewContainer} contentContainerStyle={{ paddingVertical: 10 }}>
+              {/* Opción habilitada: Tarjeta */}
+              <TouchableOpacity
+                style={[styles.paymentOption, metodoPago === "card" && styles.paymentSelected]}
+                onPress={() => setMetodoPago("card")}
+              >
+                <Text style={[styles.paymentText, metodoPago === "card" && styles.paymentTextSelected]}>
+                  Tarjeta de crédito / débito
+                </Text>
+              </TouchableOpacity>
+
+              {/* Opción deshabilitada: Transferencia */}
+              <View style={styles.disabledOption}>
+                <Text style={styles.disabledText}>Transferencia SPEI (Próximamente)</Text>
+              </View>
+
+              {/* Opción deshabilitada: Efectivo */}
+              <View style={styles.disabledOption}>
+                <Text style={styles.disabledText}>Pago en efectivo (OXXO)</Text>
+              </View>
+            </ScrollView>
+
+            <View style={styles.modalActions}>
+              <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <Text style={styles.cancelText}>Cancelar</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.modalConfirmButton}
+                onPress={() => {
+                  setModalVisible(false);
+                  handleCrearCuenta();
+                }}
+              >
+                <Text style={styles.confirmText}>Continuar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -193,12 +194,17 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     backgroundColor: "#f0f4f8",
     justifyContent: "center",
-    padding: 24,
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingTop: 64,
+    paddingBottom: 32,
   },
   card: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#fff",
     borderRadius: 20,
     padding: 24,
+    width: "100%",
+    maxWidth: 480,
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -206,8 +212,8 @@ const styles = StyleSheet.create({
   },
   headerRow: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 24,
   },
   logoSmall: {
@@ -262,7 +268,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   planTextSelected: {
-    color: "#ffffff",
+    color: "#fff",
   },
   button: {
     backgroundColor: "#2563eb",
@@ -272,8 +278,85 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   buttonText: {
-    color: "#ffffff",
+    color: "#fff",
     fontSize: 17,
+    fontWeight: "600",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    width: "85%",
+    maxHeight: 350,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 20,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#111827",
+    marginBottom: 16,
+  },
+  scrollViewContainer: {
+    maxHeight: 220,
+  },
+  paymentOption: {
+    backgroundColor: "#e5e7eb",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginBottom: 12,
+  },
+  paymentSelected: {
+    backgroundColor: "#2563eb",
+  },
+  paymentText: {
+    fontSize: 16,
+    color: "#111827",
+  },
+  paymentTextSelected: {
+    color: "#fff",
+  },
+  disabledOption: {
+    backgroundColor: "#f3f4f6",
+    borderWidth: 1,
+    borderColor: "#d1d5db",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginBottom: 12,
+    opacity: 0.6,
+    alignItems: "center",
+  },
+  disabledText: {
+    fontSize: 16,
+    color: "#9ca3af",
+    fontStyle: "italic",
+    textAlign: "center",
+  },
+  modalActions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
+    alignItems: "center",
+  },
+  cancelText: {
+    color: "#6b7280",
+    fontSize: 16,
+  },
+  modalConfirmButton: {
+    backgroundColor: "#2563eb",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  confirmText: {
+    color: "#fff",
     fontWeight: "600",
   },
 });

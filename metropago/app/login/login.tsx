@@ -8,17 +8,21 @@ import {
   Platform,
   Pressable,
   Animated,
+  Button,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import { Image } from 'react-native';
+import { Image } from "react-native";
 
-const logo = require('../../assets/images/logo1.png'); 
+const logo = require("../../assets/images/logo1.png");
 
 export default function LoginScreen(): JSX.Element {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
+  const handleStart = () => {
+    router.push("/comenzar");
+  };
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -110,6 +114,9 @@ export default function LoginScreen(): JSX.Element {
             <Text style={styles.buttonText}>Ingresar</Text>
           </Pressable>
         </Animated.View>
+        <View style={{ marginTop: 20 }}>
+          <Button title="Crear cuenta" onPress={handleStart} color="#A52019" />
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
