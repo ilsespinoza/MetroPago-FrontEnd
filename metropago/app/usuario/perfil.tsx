@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, FlatList, Pressable } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
@@ -5,7 +6,7 @@ export default function PerfilUsuario() {
   const params = useLocalSearchParams();
   const router = useRouter();
 
-  const getParam = (key: string, defaultValue: string): string => {
+  const getParam = (key: string, defaultValue: string | null): string | null => {
     const value = params[key];
     if (typeof value === 'string') {
       return decodeURIComponent(value);
@@ -13,9 +14,58 @@ export default function PerfilUsuario() {
     return defaultValue;
   };
 
-  const nombre = getParam('nombre', 'Usuario');
-  const email = getParam('email', 'usuario@example.com');
-  const plan = getParam('plan', 'Semanal');
+  const id = getParam('id', null);
+  const [usuario, setUsuario] = useState<{
+    nombre: string;
+    email: string;
+    plan?: string;
+  } | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (id) {
+      fetch(`http://192.168.1.14:3000/users/${id}`) // ← usa tu IP local
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error('Usuario no encontrado');
+          }
+          return res.json();
+        })
+        .then((data) => {
+          setUsuario(data);
+          setLoading(false);
+        })
+        .catch(() => {
+          setUsuario(null);
+          setLoading(false);
+        });
+    } else {
+      setLoading(false);
+    }
+  }, [id]);
+
+  const handleLogout = () => {
+    router.replace('/login');
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text>Cargando perfil...</Text>
+      </View>
+    );
+  }
+
+  if (!usuario) {
+    return (
+      <View style={styles.container}>
+        <Text>No se encontró el usuario</Text>
+        <Pressable style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutText}>Cerrar sesión</Text>
+        </Pressable>
+      </View>
+    );
+  }
 
   const historialPagos = [
     { id: '1', fecha: '2025-07-01', monto: '$149.00', plan: 'Semanal' },
@@ -23,19 +73,13 @@ export default function PerfilUsuario() {
     { id: '3', fecha: '2025-05-01', monto: '$149.00', plan: 'Semanal' },
   ];
 
-  const handleLogout = () => {
-    // Aquí puedes limpiar storage si estás usando AsyncStorage o cualquier otra lógica de logout
-    // AsyncStorage.clear();
-    router.replace('/login'); // Redirige al login sin volver atrás
-  };
+  const { nombre, email, plan = 'Semanal' } = usuario;
 
   return (
     <View style={styles.container}>
       <View style={styles.card}>
         <Image
-          source={{
-            uri: `https://api.dicebear.com/7.x/identicon/png?seed=${nombre}`,
-          }}
+          source={{ uri: `https://api.dicebear.com/7.x/identicon/png?seed=${nombre}` }}
           style={styles.avatar}
         />
         <Text style={styles.name}>{nombre}</Text>
