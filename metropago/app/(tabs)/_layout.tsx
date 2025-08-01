@@ -21,7 +21,7 @@ export default function TabLayout() {
         tabBarBackground: TabBarBackground,
         tabBarStyle: styles.tabBar,
         tabBarLabelStyle: styles.label,
-        headerTransparent: true,      
+        headerTransparent: true,
       }}
     >
       <Tabs.Screen
@@ -32,7 +32,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <IconSymbol size={24} name="house.fill" color={color} />
           ),
-          headerShown: false, 
+          headerShown: false,
         }}
       />
 
@@ -45,12 +45,22 @@ export default function TabLayout() {
           headerBackTitleVisible: false,
           headerLeft: () => (
             <TouchableOpacity
-              onPress={() => navigation.navigate("index")}
+              onPress={() => navigation.navigate("login")}
               style={{ marginLeft: 15 }}
             >
               <IconSymbol name="arrow.left" size={24} color="#000" />
             </TouchableOpacity>
           ),
+        })}
+      />
+
+      <Tabs.Screen
+        name="login"
+        options={({}) => ({
+          tabBarStyle: { display: "none" },
+          headerShown: true,
+          headerTitle: "",
+          headerBackTitleVisible: false,
         })}
       />
     </Tabs>
