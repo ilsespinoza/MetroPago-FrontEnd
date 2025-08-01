@@ -1,8 +1,9 @@
-import { View, Text, StyleSheet, Image, FlatList } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { View, Text, StyleSheet, Image, FlatList, Pressable } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 
 export default function PerfilUsuario() {
   const params = useLocalSearchParams();
+  const router = useRouter();
 
   const getParam = (key: string, defaultValue: string): string => {
     const value = params[key];
@@ -10,7 +11,7 @@ export default function PerfilUsuario() {
       return decodeURIComponent(value);
     }
     return defaultValue;
-  };  
+  };
 
   const nombre = getParam('nombre', 'Usuario');
   const email = getParam('email', 'usuario@example.com');
@@ -21,6 +22,12 @@ export default function PerfilUsuario() {
     { id: '2', fecha: '2025-06-01', monto: '$149.00', plan: 'Semanal' },
     { id: '3', fecha: '2025-05-01', monto: '$149.00', plan: 'Semanal' },
   ];
+
+  const handleLogout = () => {
+    // Aquí puedes limpiar storage si estás usando AsyncStorage o cualquier otra lógica de logout
+    // AsyncStorage.clear();
+    router.replace('/login'); // Redirige al login sin volver atrás
+  };
 
   return (
     <View style={styles.container}>
@@ -52,6 +59,10 @@ export default function PerfilUsuario() {
             </View>
           )}
         />
+
+        <Pressable style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutText}>Cerrar sesión</Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -130,4 +141,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#334155',
   },
+  logoutButton: {
+    marginTop: 24,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: '#ef4444',
+    borderRadius: 10,
+  },
+  logoutText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
 });
+
