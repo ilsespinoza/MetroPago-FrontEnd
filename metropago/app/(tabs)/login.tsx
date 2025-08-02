@@ -30,7 +30,7 @@ export default function LoginScreen(): JSX.Element {
       return;
     }
     try {
-      const response = await fetch("http://localhost:3000/auth/login", {
+      const response = await fetch("http://192.168.1.23:3000/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -43,13 +43,14 @@ export default function LoginScreen(): JSX.Element {
         throw new Error("Token no recibido");
       }
       await AsyncStorage.setItem("token", data.access_token);
-      router.replace("/usuario/perfil");
+
+      router.replace(`/usuario/perfil?id=${data.user.id}`);
     } catch (error: any) {
       alert(error.message || "Error desconocido");
     }
   };
 
-  // Animación simple para botón
+
   const scaleValue = new Animated.Value(1);
 
   const onPressIn = () => {

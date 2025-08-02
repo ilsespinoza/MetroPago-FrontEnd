@@ -1,13 +1,29 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, FlatList, Pressable } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  FlatList,
+  Pressable,
+} from "react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
+
+type Usuario = {
+  nombre: string;
+  email: string;
+  plan?: string;
+};
 
 export default function PerfilUsuario() {
   const params = useLocalSearchParams();
   const router = useRouter();
-  const id = params.id;
 
-  const [usuario, setUsuario] = useState(null);
+  // Manejo seguro para id, puede ser string o string[]
+  const idParam = params.id;
+  const id = Array.isArray(idParam) ? idParam[0] : idParam;
+
+  const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -15,14 +31,13 @@ export default function PerfilUsuario() {
       setLoading(false);
       return;
     }
-
-    // Hacer fetch con id
-    fetch(`http://192.168.1.14:3000/users/${id}`)
+    console.log("Buscando usuario con ID:", id);
+    fetch(`http://192.168.1.23:3000/users/${id}`)
       .then((res) => {
-        if (!res.ok) throw new Error('Usuario no encontrado');
+        if (!res.ok) throw new Error("Usuario no encontrado");
         return res.json();
       })
-      .then((data) => {
+      .then((data: Usuario) => {
         setUsuario(data);
         setLoading(false);
       })
@@ -33,7 +48,7 @@ export default function PerfilUsuario() {
   }, [id]);
 
   const handleLogout = () => {
-    router.replace('/login');
+    router.replace("/login");
   };
 
   if (loading) {
@@ -55,20 +70,24 @@ export default function PerfilUsuario() {
     );
   }
 
-  // Aquí muestra los datos como antes
+  // Datos de historial de pagos de ejemplo
   const historialPagos = [
-    { id: '1', fecha: '2025-07-01', monto: '$149.00', plan: 'Semanal' },
-    { id: '2', fecha: '2025-06-01', monto: '$149.00', plan: 'Semanal' },
-    { id: '3', fecha: '2025-05-01', monto: '$149.00', plan: 'Semanal' },
+    { id: "1", fecha: "2025-07-01", monto: "$149.00", plan: "Semanal" },
+    { id: "2", fecha: "2025-06-01", monto: "$149.00", plan: "Semanal" },
+    { id: "3", fecha: "2025-05-01", monto: "$149.00", plan: "Semanal" },
   ];
 
-  const { nombre, email, plan = 'Semanal' } = usuario;
+  const { nombre, email, plan = "Semanal" } = usuario;
 
   return (
     <View style={styles.container}>
       <View style={styles.card}>
         <Image
-          source={{ uri: `https://api.dicebear.com/7.x/identicon/png?seed=${nombre}` }}
+          source={{
+            uri: `https://api.dicebear.com/7.x/identicon/png?seed=${encodeURIComponent(
+              nombre
+            )}`,
+          }}
           style={styles.avatar}
         />
         <Text style={styles.name}>{nombre}</Text>
@@ -100,22 +119,23 @@ export default function PerfilUsuario() {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f1f5f9',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#f1f5f9",
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
-    width: '100%',
+    width: "100%",
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 20,
     padding: 30,
-    alignItems: 'center',
-    width: '90%',
-    shadowColor: '#000',
+    alignItems: "center",
+    width: "90%",
+    shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 15,
     elevation: 10,
@@ -128,61 +148,61 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 22,
-    fontWeight: 'bold',
-    color: '#111827',
+    fontWeight: "bold",
+    color: "#111827",
     marginBottom: 4,
   },
   role: {
     fontSize: 16,
-    color: '#475569',
+    color: "#475569",
     marginBottom: 6,
   },
   planName: {
-    fontWeight: '700',
-    color: '#2563eb',
+    fontWeight: "700",
+    color: "#2563eb",
   },
   email: {
     fontSize: 14,
-    color: '#64748b',
+    color: "#64748b",
     marginBottom: 10,
   },
   thankYou: {
     marginTop: 12,
     fontSize: 16,
-    fontWeight: '600',
-    color: '#059669',
+    fontWeight: "600",
+    color: "#059669",
   },
   divider: {
     height: 1,
-    backgroundColor: '#e2e8f0',
-    width: '100%',
+    backgroundColor: "#e2e8f0",
+    width: "100%",
     marginVertical: 16,
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '700',
-    color: '#1e293b',
-    alignSelf: 'flex-start',
+    fontWeight: "700",
+    color: "#1e293b",
+    alignSelf: "flex-start",
     marginBottom: 8,
   },
   pagoItem: {
     paddingVertical: 4,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
   pagoTexto: {
     fontSize: 14,
-    color: '#334155',
+    color: "#334155",
   },
   logoutButton: {
     marginTop: 24,
     paddingVertical: 10,
     paddingHorizontal: 20,
-    backgroundColor: '#ef4444',
+    backgroundColor: "#ef4444",
     borderRadius: 10,
   },
   logoutText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
     fontSize: 16,
   },
 });
