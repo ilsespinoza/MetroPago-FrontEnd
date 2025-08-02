@@ -5,43 +5,31 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 export default function PerfilUsuario() {
   const params = useLocalSearchParams();
   const router = useRouter();
+  const id = params.id;
 
-  const getParam = (key: string, defaultValue: string | null): string | null => {
-    const value = params[key];
-    if (typeof value === 'string') {
-      return decodeURIComponent(value);
-    }
-    return defaultValue;
-  };
-
-  const id = getParam('id', null);
-  const [usuario, setUsuario] = useState<{
-    nombre: string;
-    email: string;
-    plan?: string;
-  } | null>(null);
+  const [usuario, setUsuario] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (id) {
-      fetch(`http://192.168.1.14:3000/users/${id}`) // ← usa tu IP local
-        .then((res) => {
-          if (!res.ok) {
-            throw new Error('Usuario no encontrado');
-          }
-          return res.json();
-        })
-        .then((data) => {
-          setUsuario(data);
-          setLoading(false);
-        })
-        .catch(() => {
-          setUsuario(null);
-          setLoading(false);
-        });
-    } else {
+    if (!id) {
       setLoading(false);
+      return;
     }
+
+    // Hacer fetch con id
+    fetch(`http://192.168.1.14:3000/users/${id}`)
+      .then((res) => {
+        if (!res.ok) throw new Error('Usuario no encontrado');
+        return res.json();
+      })
+      .then((data) => {
+        setUsuario(data);
+        setLoading(false);
+      })
+      .catch(() => {
+        setUsuario(null);
+        setLoading(false);
+      });
   }, [id]);
 
   const handleLogout = () => {
@@ -67,6 +55,7 @@ export default function PerfilUsuario() {
     );
   }
 
+  // Aquí muestra los datos como antes
   const historialPagos = [
     { id: '1', fecha: '2025-07-01', monto: '$149.00', plan: 'Semanal' },
     { id: '2', fecha: '2025-06-01', monto: '$149.00', plan: 'Semanal' },
@@ -111,7 +100,6 @@ export default function PerfilUsuario() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
