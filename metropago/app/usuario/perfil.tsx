@@ -32,7 +32,7 @@ export default function PerfilUsuario() {
       return;
     }
     console.log("Buscando usuario con ID:", id);
-    fetch(`http://192.168.1.23:3000/users/${id}`)
+    fetch(`http://localhost:3000/users/${id}`)
       .then((res) => {
         if (!res.ok) throw new Error("Usuario no encontrado");
         return res.json();

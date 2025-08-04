@@ -59,11 +59,23 @@ export default function ComenzarScreen() {
       const data = await response.json();
 
       if (response.ok) {
-        if (data.checkoutUrl) {
-          Alert.alert("Redirigiendo a pago...");
-          Linking.openURL(data.checkoutUrl);
-        } else {
-          Alert.alert("Error", "No se pudo iniciar el pago.");
+        if (metodoPago === "card") {
+          if (data.checkoutUrl) {
+            Alert.alert("Redirigiendo a pago...");
+            Linking.openURL(data.checkoutUrl);
+          } else {
+            Alert.alert("Error", "No se pudo iniciar el pago.");
+          }
+        } else if (metodoPago === "transfer") {
+          // Mostrar instrucciones SPEI recibidas del backend
+          if (data.clabe && data.banco && data.beneficiario && data.monto && data.moneda) {
+            Alert.alert(
+              "Instrucciones SPEI",
+              `Realiza la transferencia a:\n\nBanco: ${data.banco}\nCLABE: ${data.clabe}\nBeneficiario: ${data.beneficiario}\nMonto: ${data.monto} ${data.moneda}`
+            );
+          } else {
+            Alert.alert("Error", "No se recibieron instrucciones SPEI.");
+          }
         }
       } else {
         Alert.alert("Error", data.message || "No se pudo crear la cuenta.");
@@ -156,10 +168,15 @@ export default function ComenzarScreen() {
                 </Text>
               </TouchableOpacity>
 
-              {/* Opción deshabilitada: Transferencia */}
-              <View style={styles.disabledOption}>
-                <Text style={styles.disabledText}>Transferencia SPEI (Próximamente)</Text>
-              </View>
+              {/* Opción habilitada: Transferencia SPEI */}
+              <TouchableOpacity
+                style={[styles.paymentOption, metodoPago === "transfer" && styles.paymentSelected]}
+                onPress={() => setMetodoPago("transfer")}
+              >
+                <Text style={[styles.paymentText, metodoPago === "transfer" && styles.paymentTextSelected]}>
+                  Transferencia SPEI
+                </Text>
+              </TouchableOpacity>
 
               {/* Opción deshabilitada: Efectivo */}
               <View style={styles.disabledOption}>
@@ -360,3 +377,4 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
+
