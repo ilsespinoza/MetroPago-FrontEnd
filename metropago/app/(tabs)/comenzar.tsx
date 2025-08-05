@@ -27,11 +27,31 @@ export default function ComenzarScreen() {
   const [metodoPago, setMetodoPago] = useState("card");
 
   const planesDisponibles = [
-    { nombre: "Semanal", priceId: "price_1RlI9jPKNWjJLZi9ywBM9GKo", precio: "$10 MXN" },
-    { nombre: "Mensual", priceId: "price_1RlKi7PKNWjJLZi9DF8h8D4a", precio: "$50 MXN" },
-    { nombre: "Bimensual", priceId: "price_1RlKjjPKNWjJLZi9PTB3eOOs", precio: "$100 MXN" },
-    { nombre: "Semestral", priceId: "price_1RlKmNPKNWjJLZi9lTleDTfj", precio: "$300 MXN" },
-    { nombre: "Anual", priceId: "price_1RlKnbPKNWjJLZi9rX5SLPu1", precio: "$600 MXN" },
+    {
+      nombre: "Semanal",
+      priceId: "price_1RlI9jPKNWjJLZi9ywBM9GKo",
+      precio: "$10 MXN",
+    },
+    {
+      nombre: "Mensual",
+      priceId: "price_1RlKi7PKNWjJLZi9DF8h8D4a",
+      precio: "$50 MXN",
+    },
+    {
+      nombre: "Bimensual",
+      priceId: "price_1RlKjjPKNWjJLZi9PTB3eOOs",
+      precio: "$100 MXN",
+    },
+    {
+      nombre: "Semestral",
+      priceId: "price_1RlKmNPKNWjJLZi9lTleDTfj",
+      precio: "$300 MXN",
+    },
+    {
+      nombre: "Anual",
+      priceId: "price_1RlKnbPKNWjJLZi9rX5SLPu1",
+      precio: "$600 MXN",
+    },
   ];
 
   const handleCrearCuenta = async () => {
@@ -39,9 +59,12 @@ export default function ComenzarScreen() {
       Alert.alert("Faltan datos", "Por favor completa todos los campos.");
       return;
     }
-
+    const registerUrl =
+      metodoPago === "card"
+        ? "http://localhost:3000/users/register"
+        : "http://localhost:3000/users/register-spei";
     try {
-      const response = await fetch("http://localhost:3000/users/register", {
+      const response = await fetch(registerUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -59,23 +82,11 @@ export default function ComenzarScreen() {
       const data = await response.json();
 
       if (response.ok) {
-        if (metodoPago === "card") {
-          if (data.checkoutUrl) {
-            Alert.alert("Redirigiendo a pago...");
-            Linking.openURL(data.checkoutUrl);
-          } else {
-            Alert.alert("Error", "No se pudo iniciar el pago.");
-          }
-        } else if (metodoPago === "transfer") {
-          // Mostrar instrucciones SPEI recibidas del backend
-          if (data.clabe && data.banco && data.beneficiario && data.monto && data.moneda) {
-            Alert.alert(
-              "Instrucciones SPEI",
-              `Realiza la transferencia a:\n\nBanco: ${data.banco}\nCLABE: ${data.clabe}\nBeneficiario: ${data.beneficiario}\nMonto: ${data.monto} ${data.moneda}`
-            );
-          } else {
-            Alert.alert("Error", "No se recibieron instrucciones SPEI.");
-          }
+        if (data.checkoutUrl) {
+          Alert.alert("Redirigiendo a pago...");
+          Linking.openURL(data.checkoutUrl);
+        } else {
+          Alert.alert("Error", "No se pudo iniciar el pago.");
         }
       } else {
         Alert.alert("Error", data.message || "No se pudo crear la cuenta.");
@@ -106,10 +117,30 @@ export default function ComenzarScreen() {
             />
           </View>
 
-          <TextInput style={styles.input} placeholder="Nombre" value={nombre} onChangeText={setNombre} />
-          <TextInput style={styles.input} placeholder="Apellido" value={apellido} onChangeText={setApellido} />
-          <TextInput style={styles.input} placeholder="Ciudad" value={ciudad} onChangeText={setCiudad} />
-          <TextInput style={styles.input} placeholder="Teléfono" value={telefono} onChangeText={setTelefono} />
+          <TextInput
+            style={styles.input}
+            placeholder="Nombre"
+            value={nombre}
+            onChangeText={setNombre}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Apellido"
+            value={apellido}
+            onChangeText={setApellido}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Ciudad"
+            value={ciudad}
+            onChangeText={setCiudad}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Teléfono"
+            value={telefono}
+            onChangeText={setTelefono}
+          />
           <TextInput
             style={styles.input}
             placeholder="Correo electrónico"
@@ -131,16 +162,36 @@ export default function ComenzarScreen() {
             {planesDisponibles.map((opcion) => (
               <TouchableOpacity
                 key={opcion.priceId}
-                style={[styles.planOption, plan === opcion.priceId && styles.planSelected]}
+                style={[
+                  styles.planOption,
+                  plan === opcion.priceId && styles.planSelected,
+                ]}
                 onPress={() => setPlan(opcion.priceId)}
               >
-                <Text style={[styles.planText, plan === opcion.priceId && styles.planTextSelected]}>{opcion.nombre}</Text>
-                <Text style={[styles.planPrice, plan === opcion.priceId && styles.planTextSelected]}>{opcion.precio}</Text>
+                <Text
+                  style={[
+                    styles.planText,
+                    plan === opcion.priceId && styles.planTextSelected,
+                  ]}
+                >
+                  {opcion.nombre}
+                </Text>
+                <Text
+                  style={[
+                    styles.planPrice,
+                    plan === opcion.priceId && styles.planTextSelected,
+                  ]}
+                >
+                  {opcion.precio}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
 
-          <TouchableOpacity style={styles.button} onPress={() => setModalVisible(true)}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => setModalVisible(true)}
+          >
             <Text style={styles.buttonText}>Crear Cuenta</Text>
           </TouchableOpacity>
         </View>
@@ -157,23 +208,42 @@ export default function ComenzarScreen() {
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Selecciona el método de pago</Text>
 
-            <ScrollView style={styles.scrollViewContainer} contentContainerStyle={{ paddingVertical: 10 }}>
+            <ScrollView
+              style={styles.scrollViewContainer}
+              contentContainerStyle={{ paddingVertical: 10 }}
+            >
               {/* Opción habilitada: Tarjeta */}
               <TouchableOpacity
-                style={[styles.paymentOption, metodoPago === "card" && styles.paymentSelected]}
+                style={[
+                  styles.paymentOption,
+                  metodoPago === "card" && styles.paymentSelected,
+                ]}
                 onPress={() => setMetodoPago("card")}
               >
-                <Text style={[styles.paymentText, metodoPago === "card" && styles.paymentTextSelected]}>
+                <Text
+                  style={[
+                    styles.paymentText,
+                    metodoPago === "card" && styles.paymentTextSelected,
+                  ]}
+                >
                   Tarjeta de crédito / débito
                 </Text>
               </TouchableOpacity>
 
               {/* Opción habilitada: Transferencia SPEI */}
               <TouchableOpacity
-                style={[styles.paymentOption, metodoPago === "transfer" && styles.paymentSelected]}
+                style={[
+                  styles.paymentOption,
+                  metodoPago === "transfer" && styles.paymentSelected,
+                ]}
                 onPress={() => setMetodoPago("transfer")}
               >
-                <Text style={[styles.paymentText, metodoPago === "transfer" && styles.paymentTextSelected]}>
+                <Text
+                  style={[
+                    styles.paymentText,
+                    metodoPago === "transfer" && styles.paymentTextSelected,
+                  ]}
+                >
                   Transferencia SPEI
                 </Text>
               </TouchableOpacity>
@@ -377,4 +447,3 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
-
