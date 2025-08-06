@@ -62,7 +62,11 @@ export default function ComenzarScreen() {
     const registerUrl =
       metodoPago === "card"
         ? "http://localhost:3000/users/register"
-        : "http://localhost:3000/users/register-spei";
+        : metodoPago === "transfer"
+        ? "http://localhost:3000/users/register-spei"
+        : metodoPago === "oxxo"
+        ? "http://localhost:3000/users/register-oxxo"
+        : "http://localhost:3000/users/register";
     try {
       const response = await fetch(registerUrl, {
         method: "POST",
@@ -196,8 +200,6 @@ export default function ComenzarScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-
-      {/* Modal de selección de método de pago */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -212,7 +214,6 @@ export default function ComenzarScreen() {
               style={styles.scrollViewContainer}
               contentContainerStyle={{ paddingVertical: 10 }}
             >
-              {/* Opción habilitada: Tarjeta */}
               <TouchableOpacity
                 style={[
                   styles.paymentOption,
@@ -249,9 +250,22 @@ export default function ComenzarScreen() {
               </TouchableOpacity>
 
               {/* Opción deshabilitada: Efectivo */}
-              <View style={styles.disabledOption}>
-                <Text style={styles.disabledText}>Pago en efectivo (OXXO)</Text>
-              </View>
+              <TouchableOpacity
+                style={[
+                  styles.paymentOption,
+                  metodoPago === "oxxo" && styles.paymentSelected,
+                ]}
+                onPress={() => setMetodoPago("oxxo")}
+              >
+                <Text
+                  style={[
+                    styles.paymentText,
+                    metodoPago === "oxxo" && styles.paymentTextSelected,
+                  ]}
+                >
+                  Pago en OXXO
+                </Text>
+              </TouchableOpacity>
             </ScrollView>
 
             <View style={styles.modalActions}>
