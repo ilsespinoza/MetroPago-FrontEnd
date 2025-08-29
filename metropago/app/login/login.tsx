@@ -1,4 +1,4 @@
-import React, { JSX, useState } from "react";
+import React, { JSX, useState, useRef } from "react";
 import {
   View,
   TextInput,
@@ -20,6 +20,13 @@ export default function LoginScreen(): JSX.Element {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
+
+  // Determina la URL base automáticamente
+  const BASE_URL =
+    Platform.OS === "ios"
+      ? "http://127.0.0.1:3000" // simulador iOS
+      : "http://192.168.1.23:3000"; // dispositivo físico o Android (cambia a tu IP)
+
   const handleStart = () => {
     router.push("/comenzar");
   };
@@ -30,28 +37,32 @@ export default function LoginScreen(): JSX.Element {
       return;
     }
     try {
-      const response = await fetch("http://192.168.1.23:3000/auth/login", {
+      const response = await fetch(`${BASE_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
+
       if (!response.ok) {
-        throw new Error("Credenciales inválidas");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Credenciales inválidas");
       }
+
       const data = await response.json();
+
       if (!data.access_token) {
         throw new Error("Token no recibido");
       }
-      await AsyncStorage.setItem("token", data.access_token);
 
+      await AsyncStorage.setItem("token", data.access_token);
       router.replace(`/usuario/perfil?id=${data.user.id}`);
     } catch (error: any) {
       alert(error.message || "Error desconocido");
     }
   };
 
-  // Animación simple para botón
-  const scaleValue = new Animated.Value(1);
+  // Animación del botón
+  const scaleValue = useRef(new Animated.Value(1)).current;
 
   const onPressIn = () => {
     Animated.spring(scaleValue, {
@@ -87,6 +98,7 @@ export default function LoginScreen(): JSX.Element {
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
+          autoCorrect={false}
           keyboardType="email-address"
           textContentType="emailAddress"
         />
@@ -115,6 +127,7 @@ export default function LoginScreen(): JSX.Element {
             <Text style={styles.buttonText}>Ingresar</Text>
           </Pressable>
         </Animated.View>
+
         <View style={{ marginTop: 20 }}>
           <Button title="Crear cuenta" onPress={handleStart} color="#A52019" />
         </View>
@@ -138,12 +151,6 @@ const styles = StyleSheet.create({
     fontSize: 42,
     fontWeight: "bold",
     color: "#8B0000",
-  },
-  subtitle: {
-    fontSize: 42,
-    fontWeight: "bold",
-    color: "#2563eb",
-    letterSpacing: 1.2,
   },
   form: {},
   input: {
@@ -179,5 +186,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 });
+
 
 
