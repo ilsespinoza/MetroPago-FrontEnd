@@ -21,11 +21,10 @@ export default function LoginScreen(): JSX.Element {
   const [password, setPassword] = useState("");
   const router = useRouter();
 
-  // Determina la URL base automáticamente
   const BASE_URL =
     Platform.OS === "ios"
-      ? "http://127.0.0.1:3000" // simulador iOS
-      : "http://192.168.1.23:3000"; // dispositivo físico o Android (cambia a tu IP)
+      ? "http://127.0.0.1:3000" 
+      : "http://192.168.1.23:3000"; 
 
   const handleStart = () => {
     router.push("/comenzar");
